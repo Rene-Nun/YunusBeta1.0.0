@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy: #0f172a;
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-serif { font-family: 'Instrument Serif', Georgia, serif; }
+.font-sans  { font-family: 'Geist', system-ui, sans-serif; }
+.font-mono  { font-family: 'Geist Mono', monospace; }
+
+/* Safe area for iOS */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Smooth scrolling */
+* { scroll-behavior: smooth; }
+
+/* Hide scrollbar but keep scroll */
+.overflow-y-auto::-webkit-scrollbar { display: none; }
+.overflow-y-auto { -ms-overflow-style: none; scrollbar-width: none; }
+
+@layer utilities {
+  .bg-navy { background-color: #0f172a; }
+  .text-navy { color: #0f172a; }
+  .border-navy { border-color: #0f172a; }
+  .focus\:border-navy:focus { border-color: #0f172a; }
+  .hover\:bg-navy-800:hover { background-color: #1e293b; }
+}
