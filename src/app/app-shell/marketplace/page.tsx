@@ -99,7 +99,7 @@ export default function MarketplacePage() {
       installmentsPaid: 0,
       purchasedAt: new Date().toISOString(),
     });
-    setPurchased((prev) => new Set<string>([...prev, selected.id]));
+    setPurchased((prev) => { const next = new Set<string>(prev); next.add(selected.id); return next; });
     setLoading(false);
     setSuccess(true);
     setTimeout(() => {
