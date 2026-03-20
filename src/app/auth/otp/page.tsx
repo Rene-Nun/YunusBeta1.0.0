@@ -70,7 +70,7 @@ export default function OTPPage() {
       </div>
 
       {/* OTP inputs */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-2 mb-6">
         {digits.map((d, i) => (
           <input
             key={i}
@@ -81,7 +81,7 @@ export default function OTPPage() {
             value={d}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="flex-1 aspect-square text-center text-2xl font-mono text-gray-900 border-2 rounded-xl outline-none transition-colors border-gray-200 focus:border-navy"
+            className="w-11 h-11 text-center text-xl font-mono text-gray-900 border-2 rounded-xl outline-none transition-colors border-gray-200 focus:border-navy"
           />
         ))}
       </div>
