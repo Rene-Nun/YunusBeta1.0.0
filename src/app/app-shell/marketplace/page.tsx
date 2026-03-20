@@ -5,7 +5,7 @@ import { formatMXN } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { Match } from "@/types";
+
 
 // Simulated resale listings — a subset of matches at slight markup
 const RESALE_LISTINGS = [
@@ -99,7 +99,7 @@ export default function MarketplacePage() {
       installmentsPaid: 0,
       purchasedAt: new Date().toISOString(),
     });
-    setPurchased((prev) => new Set([...prev, selected.id]));
+    setPurchased((prev) => new Set<string>([...prev, selected.id]));
     setLoading(false);
     setSuccess(true);
     setTimeout(() => {
