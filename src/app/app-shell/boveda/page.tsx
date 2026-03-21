@@ -234,7 +234,7 @@ export default function BovedaPage() {
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
       {/* Header */}
-      <div className="bg-white px-5 pt-14 pb-5 border-b border-gray-100">
+      <div className="bg-white px-5 pt-6 pb-5 border-b border-gray-100">
         <div className="flex justify-between items-start">
           <div>
             <p className="font-mono text-[10px] text-gray-300 uppercase tracking-widest mb-1">
