@@ -38,12 +38,16 @@ export default function RegistroPage() {
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
 
+    function normalize(str: string) {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
   function handleCityInput(val: string) {
     setCityInput(val);
     setForm({ ...form, city: val });
     if (val.length >= 3) {
       const filtered = CIUDADES_MX.filter((c) =>
-        c.toLowerCase().includes(val.toLowerCase())
+        normalize(c).includes(normalize(val))
       ).slice(0, 6);
       setCitySuggestions(filtered);
     } else {
