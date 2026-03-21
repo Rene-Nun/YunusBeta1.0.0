@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
-import { TopNav } from "@/components/ui/BottomNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAppStore();
@@ -21,7 +20,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-full">
-      <TopNav />
       <div className="flex-1 overflow-hidden">
         {children}
       </div>
