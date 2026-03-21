@@ -21,10 +21,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-full">
+      <TopNav />
       <div className="flex-1 overflow-hidden">
         {children}
       </div>
-      <TopNav />
     </div>
   );
 }
