@@ -129,21 +129,54 @@ export default function RegistroPage() {
           error={errors.name}
         />
 
-        {/* Fecha de nacimiento — tamaño fijo para no salirse */}
+                {/* Fecha de nacimiento */}
         <div className="w-full space-y-1.5">
           <label className="block text-[11px] font-mono uppercase tracking-widest text-gray-400">
             Fecha de nacimiento
           </label>
-          <input
-            type="date"
-            value={form.birthdate}
-            onChange={(e) => setForm({ ...form, birthdate: e.target.value })}
-            className="w-full px-4 py-3.5 border border-gray-200 rounded-lg font-sans text-[15px] text-gray-900 bg-white outline-none focus:border-navy transition-colors"
-            style={{ maxWidth: "100%", boxSizing: "border-box" }}
-          />
+          <div className="flex gap-2">
+            <select
+              value={form.birthdate.split("-")[2] || ""}
+              onChange={(e) => {
+                const parts = form.birthdate.split("-");
+                setForm({ ...form, birthdate: `${parts[0] || "2000"}-${parts[1] || "01"}-${e.target.value}` });
+              }}
+              className="flex-1 px-3 py-3.5 border border-gray-200 rounded-lg font-sans text-[14px] text-gray-900 bg-white outline-none focus:border-navy appearance-none"
+            >
+              <option value="">Día</option>
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={String(d).padStart(2, "0")}>{d}</option>
+              ))}
+            </select>
+            <select
+              value={form.birthdate.split("-")[1] || ""}
+              onChange={(e) => {
+                const parts = form.birthdate.split("-");
+                setForm({ ...form, birthdate: `${parts[0] || "2000"}-${e.target.value}-${parts[2] || "01"}` });
+              }}
+              className="flex-[1.4] px-3 py-3.5 border border-gray-200 rounded-lg font-sans text-[14px] text-gray-900 bg-white outline-none focus:border-navy appearance-none"
+            >
+              <option value="">Mes</option>
+              {["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"].map((m, i) => (
+                <option key={m} value={String(i + 1).padStart(2, "0")}>{m}</option>
+              ))}
+            </select>
+            <select
+              value={form.birthdate.split("-")[0] || ""}
+              onChange={(e) => {
+                const parts = form.birthdate.split("-");
+                setForm({ ...form, birthdate: `${e.target.value}-${parts[1] || "01"}-${parts[2] || "01"}` });
+              }}
+              className="flex-[1.2] px-3 py-3.5 border border-gray-200 rounded-lg font-sans text-[14px] text-gray-900 bg-white outline-none focus:border-navy appearance-none"
+            >
+              <option value="">Año</option>
+              {Array.from({ length: 82 }, (_, i) => new Date().getFullYear() - 17 - i).map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
           {errors.birthdate && <p className="text-xs text-red-500">{errors.birthdate}</p>}
         </div>
-
         {/* Ciudad con buscador */}
         <div className="w-full space-y-1.5 relative">
           <label className="block text-[11px] font-mono uppercase tracking-widest text-gray-400">
