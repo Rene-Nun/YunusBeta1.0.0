@@ -1,5 +1,11 @@
-import { redirect } from "next/navigation";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AppShellRoot() {
-  redirect("/app-shell/chat");
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/app-shell/chat");
+  }, [router]);
+  return null;
 }
