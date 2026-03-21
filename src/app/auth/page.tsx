@@ -28,7 +28,7 @@ export default function AuthPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col justify-between bg-white px-6 pt-20 pb-12 max-w-[430px] mx-auto">
+    <main className="min-h-screen flex flex-col justify-between bg-white px-6 pt-10 pb-12 max-w-[430px] mx-auto">
       <div>
         {/* Logo area */}
         <div className="mb-16">
