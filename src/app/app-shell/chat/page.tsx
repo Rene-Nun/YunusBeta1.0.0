@@ -151,12 +151,11 @@ export default function ChatPage() {
 
           {/* Botón Bóveda */}
           <Link href="/app-shell/boveda">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 active:bg-white/10 transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
-              <span className="font-mono text-[10px] text-slate-400">Bóveda</span>
             </div>
           </Link>
 
@@ -173,10 +172,9 @@ export default function ChatPage() {
 
           {/* Botón Marketplace */}
           <Link href="/app-shell/marketplace">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 active:bg-white/10 transition-colors">
-              <span className="font-mono text-[10px] text-slate-400">Mkt</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <path d="M16 10a4 4 0 01-8 0"/>
