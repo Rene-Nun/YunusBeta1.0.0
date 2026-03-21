@@ -7,20 +7,55 @@ import { useAppStore } from "@/store/appStore";
 import { calculateAge } from "@/lib/utils";
 import { MOCK_TICKETS } from "@/lib/mockData";
 
-const CITIES = [
-  "Ciudad de México", "Guadalajara", "Monterrey", "Puebla",
-  "Tijuana", "Cancún", "Mérida", "León", "Querétaro", "Otro",
+const CIUDADES_MX = [
+  "Acapulco","Aguascalientes","Campeche","Cancún","Celaya","Chetumal",
+  "Chihuahua","Chilpancingo","Ciudad de México","Ciudad Juárez","Ciudad Obregón",
+  "Ciudad Victoria","Coatzacoalcos","Colima","Cuernavaca","Culiacán","Durango",
+  "Ensenada","Fresnillo","Guadalajara","Guanajuato","Guaymas","Hermosillo",
+  "Irapuato","Jalapa","La Paz","León","Los Cabos","Los Mochis","Manzanillo",
+  "Matamoros","Mazatlán","Mérida","Mexicali","Monterrey","Morelia","Nogales",
+  "Nuevo Laredo","Oaxaca","Pachuca","Piedras Negras","Playa del Carmen","Puebla",
+  "Puerto Vallarta","Querétaro","Reynosa","Saltillo","San Cristóbal de las Casas",
+  "San Luis Potosí","Tampico","Tapachula","Tepic","Tijuana","Tlaxcala","Toluca",
+  "Torreón","Tuxtla Gutiérrez","Uruapan","Veracruz","Villahermosa","Xalapa",
+  "Zacatecas","Zamora","Zihuatanejo",
+];
+
+const SALARIOS = [
+  "Menos de $5,000","$5,000 – $10,000","$10,000 – $20,000",
+  "$20,000 – $35,000","$35,000 – $50,000","Más de $50,000",
 ];
 
 export default function RegistroPage() {
   const router = useRouter();
   const { setUser, loadMockTickets } = useAppStore();
 
-  const [form, setForm] = useState({ name: "", birthdate: "", city: "" });
+  const [form, setForm] = useState({ name: "", birthdate: "", city: "", salary: "" });
+  const [cityInput, setCityInput] = useState("");
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
   const [accepted, setAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
+
+  function handleCityInput(val: string) {
+    setCityInput(val);
+    setForm({ ...form, city: val });
+    if (val.length >= 3) {
+      const filtered = CIUDADES_MX.filter((c) =>
+        c.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 6);
+      setCitySuggestions(filtered);
+    } else {
+      setCitySuggestions([]);
+    }
+  }
+
+  function selectCity(city: string) {
+    setCityInput(city);
+    setForm({ ...form, city });
+    setCitySuggestions([]);
+  }
 
   function validate() {
     const e: Record<string, string> = {};
@@ -29,6 +64,7 @@ export default function RegistroPage() {
     else if (calculateAge(form.birthdate) < 18)
       e.birthdate = "Solo para mayores de 18 años.";
     if (!form.city) e.city = "Selecciona tu ciudad.";
+    if (!form.salary) e.salary = "Selecciona tu rango de salario.";
     if (!accepted) e.terms = "Debes aceptar los términos para continuar.";
     return e;
   }
@@ -48,7 +84,6 @@ export default function RegistroPage() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
     setLoading(true);
     const hasLocation = await requestLocation();
     if (!hasLocation) {
@@ -56,7 +91,6 @@ export default function RegistroPage() {
       setLoading(false);
       return;
     }
-
     await new Promise((r) => setTimeout(r, 600));
     const phone = sessionStorage.getItem("yunus_phone") ?? "0000000000";
     setUser({
@@ -81,12 +115,11 @@ export default function RegistroPage() {
         <h2 className="font-serif text-4xl text-gray-900 leading-tight mb-2">
           Crea tu <em>perfil.</em>
         </h2>
-        <p className="text-sm text-gray-400">
-          Solo lo necesitamos una vez.
-        </p>
+        <p className="text-sm text-gray-400">Solo lo necesitamos una vez.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Nombre */}
         <Input
           label="Nombre completo"
           type="text"
@@ -95,30 +128,72 @@ export default function RegistroPage() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           error={errors.name}
         />
-        <Input
-          label="Fecha de nacimiento"
-          type="date"
-          value={form.birthdate}
-          onChange={(e) => setForm({ ...form, birthdate: e.target.value })}
-          error={errors.birthdate}
-        />
 
+        {/* Fecha de nacimiento — tamaño fijo para no salirse */}
         <div className="w-full space-y-1.5">
+          <label className="block text-[11px] font-mono uppercase tracking-widest text-gray-400">
+            Fecha de nacimiento
+          </label>
+          <input
+            type="date"
+            value={form.birthdate}
+            onChange={(e) => setForm({ ...form, birthdate: e.target.value })}
+            className="w-full px-4 py-3.5 border border-gray-200 rounded-lg font-sans text-[15px] text-gray-900 bg-white outline-none focus:border-navy transition-colors"
+            style={{ maxWidth: "100%", boxSizing: "border-box" }}
+          />
+          {errors.birthdate && <p className="text-xs text-red-500">{errors.birthdate}</p>}
+        </div>
+
+        {/* Ciudad con buscador */}
+        <div className="w-full space-y-1.5 relative">
           <label className="block text-[11px] font-mono uppercase tracking-widest text-gray-400">
             Ciudad de residencia
           </label>
-          <select
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-            className="w-full px-4 py-3.5 border border-gray-200 rounded-lg font-sans text-[15px] text-gray-900 bg-white outline-none focus:border-navy transition-colors appearance-none"
-          >
-            <option value="">Selecciona tu ciudad</option>
-            {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <input
+            type="text"
+            value={cityInput}
+            onChange={(e) => handleCityInput(e.target.value)}
+            placeholder="Escribe tu ciudad..."
+            className="w-full px-4 py-3.5 border border-gray-200 rounded-lg font-sans text-[15px] text-gray-900 bg-white outline-none focus:border-navy transition-colors"
+          />
+          {citySuggestions.length > 0 && (
+            <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden top-full mt-1">
+              {citySuggestions.map((city) => (
+                <button
+                  key={city}
+                  type="button"
+                  onClick={() => selectCity(city)}
+                  className="w-full text-left px-4 py-3 text-sm font-sans text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0"
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+          )}
           {errors.city && <p className="text-xs text-red-500">{errors.city}</p>}
         </div>
 
-        {/* Terms */}
+                {/* Salario mensual */}
+        <div className="w-full space-y-1.5">
+          <label className="block text-[11px] font-mono uppercase tracking-widest text-gray-400">
+            Salario mensual
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-sans text-[15px]">$</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="0"
+              value={form.salary}
+              onChange={(e) => setForm({ ...form, salary: e.target.value })}
+              className="w-full pl-8 pr-16 py-3.5 border border-gray-200 rounded-lg font-sans text-[15px] text-gray-900 bg-white outline-none focus:border-navy transition-colors"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-[11px]">MXN</span>
+          </div>
+          {errors.salary && <p className="text-xs text-red-500">{errors.salary}</p>}
+        </div>
+
+        {/* Términos */}
         <label className="flex gap-3 items-start cursor-pointer">
           <div
             onClick={() => setAccepted(!accepted)}
@@ -141,7 +216,7 @@ export default function RegistroPage() {
         {errors.terms && <p className="text-xs text-red-500 -mt-2">{errors.terms}</p>}
 
         {locationError && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-700 font-sans">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-700">
             📍 {locationError}
           </div>
         )}
