@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { TopNav } from "@/components/ui/BottomNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAppStore();
@@ -21,10 +21,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden pb-[65px]">
+      <div className="flex-1 overflow-hidden">
         {children}
       </div>
-      <BottomNav />
+      <TopNav />
     </div>
   );
 }
