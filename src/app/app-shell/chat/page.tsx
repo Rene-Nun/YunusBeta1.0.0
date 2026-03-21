@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAppStore } from "@/store/appStore";
 import { ChatMessage, QuoteCard as QuoteCardType } from "@/types";
@@ -45,23 +46,15 @@ function QuoteCard({ card, onPay }: { card: QuoteCardType; onPay: () => void }) 
       <div className="bg-slate-800 px-4 py-2.5 flex border-t border-white/5">
         <div className="flex-1 text-center">
           <div className="font-mono text-[8px] text-slate-500 mb-0.5">Total</div>
-          <div className="font-mono text-[11px] text-white font-semibold">
-            {formatMXN(card.totalPrice)}
-          </div>
+          <div className="font-mono text-[11px] text-white font-semibold">{formatMXN(card.totalPrice)}</div>
         </div>
         <div className="flex-1 text-center border-x border-white/5">
           <div className="font-mono text-[8px] text-amber-400 mb-0.5">Anticipo 15%</div>
-          <div className="font-mono text-[11px] text-amber-400 font-semibold">
-            {formatMXN(card.downPayment)}
-          </div>
+          <div className="font-mono text-[11px] text-amber-400 font-semibold">{formatMXN(card.downPayment)}</div>
         </div>
         <div className="flex-1 text-center">
-          <div className="font-mono text-[8px] text-green-400 mb-0.5">
-            {card.installmentsTotal}x Quinc.
-          </div>
-          <div className="font-mono text-[11px] text-green-400 font-semibold">
-            {formatMXN(card.installmentAmount)}
-          </div>
+          <div className="font-mono text-[8px] text-green-400 mb-0.5">{card.installmentsTotal}x Quinc.</div>
+          <div className="font-mono text-[11px] text-green-400 font-semibold">{formatMXN(card.installmentAmount)}</div>
         </div>
       </div>
       <div className="bg-slate-800 px-4 pb-3 border-t border-white/5">
@@ -71,9 +64,7 @@ function QuoteCard({ card, onPay }: { card: QuoteCardType; onPay: () => void }) 
             <div key={i} className="h-1 flex-1 bg-white/10 rounded-full" />
           ))}
         </div>
-        <div className="font-mono text-[9px] text-slate-500">
-          {formatMXN(card.installmentAmount)}/quincena
-        </div>
+        <div className="font-mono text-[9px] text-slate-500">{formatMXN(card.installmentAmount)}/quincena</div>
       </div>
       <div className="bg-slate-800 px-4 pb-4 border-t border-white/5">
         <button
@@ -90,7 +81,6 @@ function QuoteCard({ card, onPay }: { card: QuoteCardType; onPay: () => void }) 
 export default function ChatPage() {
   const { user, messages, addMessage, addTicket } = useAppStore();
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [paidCards, setPaidCards] = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -108,37 +98,21 @@ export default function ChatPage() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages]);
 
   async function sendMessage() {
     const text = input.trim();
     if (!text) return;
     setInput("");
 
-    const userMsg: ChatMessage = {
-      id: `m_${Date.now()}`,
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    };
-    addMessage(userMsg);
-    setIsTyping(true);
-
-    const thinkingMsg: ChatMessage = {
-      id: `thinking_${Date.now()}`,
-      role: "agent",
-      content: "__thinking__",
-      timestamp: new Date(),
-    };
-    addMessage(thinkingMsg);
+    addMessage({ id: `m_${Date.now()}`, role: "user", content: text, timestamp: new Date() });
+    addMessage({ id: `thinking_${Date.now()}`, role: "agent", content: "__thinking__", timestamp: new Date() });
 
     await new Promise((r) => setTimeout(r, 2500));
-    setIsTyping(false);
 
     if (!isWorldCupRelated(text)) {
       addMessage({
-        id: `r_${Date.now()}`,
-        role: "agent",
+        id: `r_${Date.now()}`, role: "agent",
         content: "Solo estructuro planes del Mundial 2026. ¿A qué partido deseas ir? Puedes decirme la sede, los equipos o la fecha.",
         timestamp: new Date(),
       });
@@ -146,20 +120,10 @@ export default function ChatPage() {
     }
 
     const match = findMatch(text) ?? MATCHES.filter((m) => m.price > 0)[Math.floor(Math.random() * 8)];
-
-    const card: QuoteCardType = {
-      match,
-      totalPrice: match.price,
-      downPayment: calcDownPayment(match.price),
-      installmentAmount: calcInstallment(match.price),
-      installmentsTotal: 5,
-    };
-
     addMessage({
-      id: `r_${Date.now()}`,
-      role: "agent",
+      id: `r_${Date.now()}`, role: "agent",
       content: "¡Encontré algo perfecto para ti! 🏆 Aquí está tu plan de acceso:",
-      card,
+      card: { match, totalPrice: match.price, downPayment: calcDownPayment(match.price), installmentAmount: calcInstallment(match.price), installmentsTotal: 5 },
       timestamp: new Date(),
     });
   }
@@ -167,84 +131,74 @@ export default function ChatPage() {
   function handlePay(msg: ChatMessage) {
     if (!msg.card) return;
     setPaidCards((prev) => { const next = new Set<string>(prev); next.add(msg.id); return next; });
-    const ticket = {
-      id: `t_${Date.now()}`,
-      matchId: msg.card.match.id,
-      match: msg.card.match,
-      status: "pending_payment" as const,
-      totalPrice: msg.card.totalPrice,
-      downPayment: msg.card.downPayment,
-      installmentAmount: msg.card.installmentAmount,
-      installmentsTotal: msg.card.installmentsTotal,
-      installmentsPaid: 0,
-      purchasedAt: new Date().toISOString(),
-    };
-    addTicket(ticket);
-    addMessage({
-      id: `pay_${Date.now()}`,
-      role: "agent",
-      content: "¡Perfecto! Tu boleto está en tu Bóveda esperando el enganche. Revisa las instrucciones de pago ahí. 🎫",
-      timestamp: new Date(),
+    addTicket({
+      id: `t_${Date.now()}`, matchId: msg.card.match.id, match: msg.card.match,
+      status: "pending_payment", totalPrice: msg.card.totalPrice, downPayment: msg.card.downPayment,
+      installmentAmount: msg.card.installmentAmount, installmentsTotal: msg.card.installmentsTotal,
+      installmentsPaid: 0, purchasedAt: new Date().toISOString(),
     });
+    addMessage({ id: `pay_${Date.now()}`, role: "agent", content: "¡Perfecto! Tu boleto está en tu Bóveda esperando el enganche. 🎫", timestamp: new Date() });
   }
 
   const visibleMessages = messages.filter((m) => !m.id.startsWith("thinking_"));
 
   return (
     <div className="flex flex-col h-full" style={{ background: "#0f172a" }}>
-      {/* Header */}
-      <div className="px-5 pt-14 pb-4 border-b border-white/5 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-            <span className="font-serif text-sm text-white">Y</span>
+
+      {/* ── HEADER ÚNICO ── */}
+      <div className="flex-shrink-0" style={{ background: "#0f172a" }}>
+        {/* Safe area top + navegación */}
+        <div className="flex items-center justify-between px-5 pt-12 pb-3 border-b border-white/5">
+          <Link href="/app-shell/boveda">
+            <span className="font-mono text-xs text-slate-400 hover:text-white transition-colors">
+              Bóveda
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+              <span className="font-serif text-[10px] text-white">Y</span>
+            </div>
+            <div>
+              <p className="font-sans text-xs text-white font-medium leading-none">Yunus</p>
+              <p className="font-mono text-[9px] text-slate-500 leading-none mt-0.5">Agente · Mundial 2026</p>
+            </div>
           </div>
-          <div>
-            <p className="font-sans text-sm text-white font-medium">Yunus</p>
-            <p className="font-mono text-[10px] text-slate-400">Agente · Mundial 2026</p>
-          </div>
+
+          <Link href="/app-shell/marketplace">
+            <span className="font-mono text-xs text-slate-400 hover:text-white transition-colors">
+              Marketplace
+            </span>
+          </Link>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* ── MENSAJES ── */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {visibleMessages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
+          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "agent" && (
               <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
                 <span className="font-serif text-[10px] text-white">Y</span>
               </div>
             )}
-            <div className={`max-w-[78%]`}>
+            <div className="max-w-[78%]">
               {msg.content === "__thinking__" ? (
                 <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3">
-                  <p className="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-2">
-                    Yunus está procesando
-                  </p>
+                  <p className="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-2">Yunus está procesando</p>
                   {["⚡ Analizando inventario...", "🔍 Cruzando con tu perfil...", "✅ Estructurando plan..."].map((s, i) => (
-                    <p key={i} className="font-mono text-[10px] text-slate-500 mb-1 animate-pulse"
-                       style={{ animationDelay: `${i * 0.3}s` }}>
-                      {s}
-                    </p>
+                    <p key={i} className="font-mono text-[10px] text-slate-500 mb-1 animate-pulse" style={{ animationDelay: `${i * 0.3}s` }}>{s}</p>
                   ))}
                 </div>
               ) : (
                 <>
                   <div
-                    className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-white text-[#0f172a] rounded-tr-sm font-sans"
-                        : "border border-white/10 text-slate-200 rounded-tl-sm font-sans"
-                    }`}
+                    className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed ${msg.role === "user" ? "bg-white text-[#0f172a] rounded-tr-sm font-sans" : "border border-white/10 text-slate-200 rounded-tl-sm font-sans"}`}
                     style={msg.role === "agent" ? { background: "rgba(255,255,255,0.06)" } : {}}
                   >
                     {msg.content}
                   </div>
-                  {msg.card && !paidCards.has(msg.id) && (
-                    <QuoteCard card={msg.card} onPay={() => handlePay(msg)} />
-                  )}
+                  {msg.card && !paidCards.has(msg.id) && <QuoteCard card={msg.card} onPay={() => handlePay(msg)} />}
                   {msg.card && paidCards.has(msg.id) && (
                     <div className="mt-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-xl max-w-[280px]">
                       <p className="font-mono text-[10px] text-green-400">✓ Boleto movido a tu Bóveda</p>
@@ -253,9 +207,7 @@ export default function ChatPage() {
                 </>
               )}
               <p className="font-mono text-[9px] text-slate-600 mt-1 px-1">
-                {msg.timestamp instanceof Date
-                  ? msg.timestamp.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
-                  : new Date(msg.timestamp).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                {new Date(msg.timestamp).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
           </div>
@@ -263,7 +215,7 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* ── INPUT ── */}
       <div className="px-4 py-3 border-t border-white/5 flex-shrink-0" style={{ background: "#0f172a" }}>
         <div className="flex gap-2 items-center">
           <input
@@ -280,21 +232,16 @@ export default function ChatPage() {
             disabled={!input.trim()}
             className="w-10 h-10 rounded-xl bg-white flex items-center justify-center disabled:opacity-30 active:scale-95 transition-transform flex-shrink-0"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="12" y1="19" x2="12" y2="5"/>
-              <polyline points="5 12 12 5 19 12"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
             </svg>
           </button>
         </div>
         <div className="flex gap-2 mt-2 flex-wrap">
           {["México en CDMX", "Partido en GDL", "Final del Mundial"].map((s) => (
-            <button
-              key={s}
-              onClick={() => setInput(s)}
+            <button key={s} onClick={() => setInput(s)}
               className="text-[10px] font-mono text-slate-500 rounded-lg px-2.5 py-1 active:bg-white/5 transition-colors"
-              style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-            >
+              style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
               {s}
             </button>
           ))}
