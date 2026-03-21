@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-sans bg-white text-gray-900 h-full">
-        <div id="app" className="h-screen max-w-[430px] mx-auto relative overflow-hidden">
+      <div id="app" className="max-w-[430px] mx-auto relative overflow-hidden" style={{ height: "100dvh" }}>
           {children}
         </div>
       </body>
