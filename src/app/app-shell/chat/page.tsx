@@ -147,7 +147,7 @@ export default function ChatPage() {
 
       {/* ── HEADER ÚNICO ── */}
       <div className="flex-shrink-0" style={{ background: "#0f172a" }}>
-        <div className="flex items-center justify-between px-5 pt-12 pb-3 border-b border-white/5">
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/5">
 
           {/* Botón Bóveda */}
           <Link href="/app-shell/boveda">
