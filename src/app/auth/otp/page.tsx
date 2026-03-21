@@ -48,7 +48,7 @@ export default function OTPPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-white px-6 pt-16 pb-12 max-w-[430px] mx-auto">
+    <main className="min-h-screen flex flex-col bg-white px-6 pt-8 pb-12 max-w-[430px] mx-auto">
       <button
         onClick={() => router.back()}
         className="text-gray-400 font-mono text-xs mb-10 self-start flex items-center gap-1"
