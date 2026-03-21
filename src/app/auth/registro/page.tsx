@@ -110,7 +110,7 @@ export default function RegistroPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-white px-6 pt-14 pb-16 max-w-[430px] mx-auto overflow-y-auto">
+    <main className="min-h-screen flex flex-col bg-white px-6 pt-8 pb-16 max-w-[430px] mx-auto overflow-y-auto">
       <button onClick={() => router.back()} className="text-gray-400 font-mono text-xs mb-10 self-start">
         ← Atrás
       </button>
