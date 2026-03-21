@@ -9,7 +9,7 @@
 }
 
 html, body {
-  height: 100%;
+  height: 100dvh;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
