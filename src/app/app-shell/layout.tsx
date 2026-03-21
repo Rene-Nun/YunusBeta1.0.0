@@ -1,16 +1,21 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
 import { BottomNav } from "@/components/ui/BottomNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAppStore();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isAuthenticated) router.replace("/auth");
-  }, [isAuthenticated, router]);
+    if (!isAuthenticated) {
+      router.replace("/auth");
+    } else if (pathname === "/app-shell" || pathname === "/app-shell/") {
+      router.replace("/app-shell/chat");
+    }
+  }, [isAuthenticated, pathname, router]);
 
   if (!isAuthenticated) return null;
 
